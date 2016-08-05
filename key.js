@@ -1,3 +1,44 @@
+if(!events)
+	var events={};
+
+(function(namespace)
+{
+var EventBinder =(function(el)
+{
+
+ // Return a module for binding event to element
+      return {
+	   	   "on":(function(type, callback){   	   	
+				 if(el.addEventListener)
+					el.addEventListener(type, callback, false);
+				else if(el.attachEvent)
+					el.attachEvent("on"+type, callback, false);	
+				el["dom"+type] = callback;
+	   	   }),
+	   	   "off":(function(type, callback){   	   	      
+	   	          var calls= callback || el["dom"+type];
+				 if(el.removeEventListener){
+				     	el.removeEventListener(type,calls);
+				   }else{
+				     	el.detachEvent("on"+type,calls);
+				 }
+	   	   }),
+	   	   "emit":(function(eventobject,type){
+		        if(el){
+
+		  		if(el.dispatchEvent){
+		  			el.dispatchEvent(eventobject);
+		  		}else if(el.fireEvent && type){
+		  			el.fireEvent("on"+ type,eventobject);
+		  		}
+		  	}
+	   	   })
+   	};
+
+
+});
+
+
 var KeyPress =(function(options){
 	
 	if(!options)       var options ={};
@@ -57,11 +98,11 @@ var KeyPress =(function(options){
 		var events = {"type":null, "proc":null};
 		if(typeof type==='string'){
 			var type = type.toLowerCase();
-			if(type==="down"){
+			if(type==="down" || type =='keydown'){
 				events.type ="keydown";
 				events.proc = keydown;
 			} 
-			else if(type==="up"){
+			else if(type==="up" || type =='keyup'){
 				events.type ="keyup";
 				events.proc = keyup;
 			}else{
@@ -166,4 +207,3 @@ return area;
 namespace.Rect= GetRect;
 namespace.Key = KeyPress;
 })(events);
-
